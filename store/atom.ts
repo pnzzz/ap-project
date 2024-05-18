@@ -6,4 +6,6 @@ export const leaderboard = atom<object[]>([]);
 
 export const time = atom<number>(0);
 
-export const currentDay = atom<number>(1);
+export const currentDay = atom<number>(0);
+
+export const sIsTransitionVisible = atom<boolean>(true);
