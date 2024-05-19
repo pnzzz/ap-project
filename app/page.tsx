@@ -26,7 +26,7 @@ export default function Home() {
 							How To Play
 						</Button>
 					</DialogTrigger>
-					<DialogContent className="w-full max-w-[800px]">
+					<DialogContent className="w-full max-w-[800px] h-full max-h-[700px] overflow-scroll">
 						<DialogTitle>How To Play</DialogTitle>
 						<DialogDescription>You are a Farmer. Plant and Harvest Crops to Earn Points.</DialogDescription>
 						<h1 className="text-lg font-semibold mt-4">Starting Off</h1>

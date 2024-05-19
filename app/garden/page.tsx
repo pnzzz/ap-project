@@ -114,7 +114,7 @@ export default function Garden() {
   // Day Change Function
   const dayChange = () => {
 		if (day === 0) setDay(1);
-		else if (day === 15) router.push("/end")
+		else if (day === 100) router.push("/end")
 		else setDay((prevDay) => prevDay + 1);
     setWeather(getRandomWeather());
     setGarden((prevGarden) => processGarden(prevGarden));
@@ -227,7 +227,7 @@ export default function Garden() {
 									<p className="text-3xl">{plant.type.icon}</p>
 									<p>{plant.type.name}</p>
 								</div>
-								: <div></div>}
+								: <div>{plant.water}</div>}
               </div>
             ))}
           </div>
