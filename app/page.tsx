@@ -58,7 +58,7 @@ export default function Home() {
 									<div>Make sure to water plants 2-3 times per day - do not over water them. Do not water plants if raining.</div>
 								</div>
 								<div className="flex flex-row justify-between items-center">
-									<div>Plants grow weeds daily - don't worry about overweeding them.</div>
+									<div>Plants grow weeds daily - don&apos;t worry about overweeding them.</div>
 								</div>
 								<div className="flex flex-row justify-between items-center">
 									<div>Plants that die earn no points.</div>
@@ -67,7 +67,7 @@ export default function Home() {
 									<div>Weather changes daily - see below chances.</div>
 								</div>
 								<div className="flex flex-row justify-between items-center">
-									<div>Seeds will turn into plant when it is ready to harvest! - The more you wait, the less points you recieve.</div>
+									<div>Seeds will turn into plant when it is ready to harvest! - If you do not harvest the plant soon, it will die.</div>
 								</div>
 							</div>
 							<h1 className="text-lg font-semibold mt-4">Tools</h1>

@@ -124,8 +124,8 @@ export default function Garden() {
         }
         if (weather === "rainy") plant.water += 10;
         if (weather === "sunny") plant.water -= 10;
-
-        if (plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0) {
+					
+        if (plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0 || plant.age + 1 > plant.type.growTime) {
           newDead++;
           return { ...plant, type: null, plowed: false, weeds: 0, health: 100, age: 0 };
         }
@@ -204,7 +204,7 @@ export default function Garden() {
 					<h1 className="text-3xl font-bold max-md:text-lg">Score: {score}</h1>
 				</div>
         <div className="w-full">
-          <h1 className="text-3xl font-bold text-center max-md:hidden">{player}'s Garden</h1>
+          <h1 className="text-3xl font-bold text-center max-md:hidden">{player}&apos;s Garden</h1>
         </div>
         <div className="flex justify-end">
           <Button onClick={handleNextDay}>Next Day</Button>
@@ -228,7 +228,7 @@ export default function Garden() {
               <div onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
                 {plant.type ? 
 								<div className="flex flex-col gap-2 max-md:gap-0 text-center justify-center select-none">
-								{plant.age === plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
+								{plant.age >= plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
 									<p className="max-sm:hidden">{plant.type.name}</p>
 									{plant.weeds > 0 ? <p className="text-red-500 max-sm:text-[8px]">🌿 {plant.weeds}</p> : <p className="max-sm:text-[8px]">🌿 0</p>}
 								</div>
