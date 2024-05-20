@@ -2,24 +2,44 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { currentDay, sIsTransitionVisible } from "@/store/atom";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { Input } from "@/components/ui/input";
+import { currentDay, currentPlayer, sIsTransitionVisible } from "@/store/atom";
+import { useAtomValue, useSetAtom } from "jotai";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
 	const setIsTransitionVisibl = useSetAtom(sIsTransitionVisible);
+	const setPlayerName = useSetAtom(currentPlayer);
+	const [name, setName] = useState<string>("");
   const day = useAtomValue(currentDay);
+	const startGame = () => {
+		// start game
+		setPlayerName(name)
+		setIsTransitionVisibl(true)
+	}
 	return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold">Welcome to the Game</h1>
+      <h1 className="text-4xl font-bold">Welcome to the Garden</h1>
       <div className="flex flex-col gap-4 justify-center items-center">
-        <Link href="/garden">
-					{day > 0 ? <Button size="lg">Continue Game</Button> :
-          <Button size="lg" onClick={() => setIsTransitionVisibl(true)}>
-            New Game
-          </Button>
+					{day > 0 ? <Link href="/garden"><Button size="lg">Continue Game</Button></Link> :
+          <Dialog>
+					<DialogTrigger>
+						<Button size="lg">
+							New Game
+						</Button>
+					</DialogTrigger>
+					<DialogContent className="w-full max-w-[800px] h-full max-h-[700px] overflow-scroll">
+						<DialogTitle>Enter Your Name</DialogTitle>
+						<div className="flex flex-col gap-2 w-full">
+							<Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" />
+							<Link href="/garden">
+								<Button className="w-full" onClick={startGame} size="lg">Play!</Button>
+							</Link>
+						</div>
+					</DialogContent>
+				</Dialog>
 					}
-        </Link>
 				<Dialog>
 					<DialogTrigger>
 						<Button size="lg">
@@ -47,7 +67,7 @@ export default function Home() {
 									<div>Weather changes daily - see below chances.</div>
 								</div>
 								<div className="flex flex-row justify-between items-center">
-									<div>Seeds will turn into plant 1-3 days before or after plant is ready to harvest - Remember the day you planted it!</div>
+									<div>Seeds will turn into plant when it is ready to harvest! - The more you wait, the less points you recieve.</div>
 								</div>
 							</div>
 							<h1 className="text-lg font-semibold mt-4">Tools</h1>
@@ -97,6 +117,10 @@ export default function Home() {
 								<div className="flex flex-row justify-between items-center">
 									<div className="text-2xl">🥕</div>
 									<div>Time to Grow - 10 Days | 1 Point</div>
+								</div>
+								<div className="flex flex-row justify-between items-center">
+									<div className="text-2xl">🌽</div>
+									<div>Time to Grow - 20 Days | 3 Points</div>
 								</div>
 							</div>
 							<h1 className="text-lg font-semibold mt-4">End Game</h1>
