@@ -167,25 +167,29 @@ export default function Garden() {
           break;
         case "harvest":
           if (plant.type?.growTime === plant.age) {
-						if (plant.type?.name === "carrot") {
+						if (plant.type.name === "carrot") {
 							setScore((score) => score + 1);
-							plant.type = null;
+							
 						}
-						if (plant.type?.name === "corn") {
+						if (plant.type.name === "corn") {
 							setScore((score) => score + 3);
-							plant.type = null;
 						}
+						plant.type = null;
+						plant.plowed = false;
+						plant.weeds = 0;
+						plant.health = 100;
+						plant.age = 0;
           } else toast.error("This plant isn't ready to be harvested yet!");
           break;
         case "carrot":
           if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
-          else plant.type = { name: "Carrot", growTime: 10, icon: "🥕" };
+          else plant.type = { name: "carrot", growTime: 1, icon: "🥕" };
           break;
 				case "corn":
 					if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
-					else plant.type = { name: "Corn", growTime: 20, icon: "🌽" };
+					else plant.type = { name: "corn", growTime: 1, icon: "🌽" };
 					break;
       }
 
@@ -199,7 +203,7 @@ export default function Garden() {
 			<TransitionScreen day={day} isVisible={isTransitionVisible} dead={dead} weather={weather} />
 			{showImages && <Sunny weather={weather} />}
 			{weather === "snowy" && <Snowfall />}
-      <header className="grid grid-cols-3 w-full items-center bg-background/90 p-2 rounded-xl">
+      <header className="grid grid-cols-3 w-full items-center bg-background/90 p-2 rounded-xl max-sm:mb-2">
         <div className="text-start">
 					<h1 className="text-3xl font-bold max-md:text-lg">Score: {score}</h1>
 				</div>
