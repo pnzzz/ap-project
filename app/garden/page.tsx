@@ -5,7 +5,7 @@ import { currentDay, currentPlayer, gardenAtom, sIsTransitionVisible, showImages
 import { useAtom, useAtomValue } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Snowfall } from "react-snowfall";
 import { toast } from "sonner";
 
@@ -116,16 +116,10 @@ export default function Garden() {
     let newDead = 0;
     const newPlants = garden.plants.map((plant) => {
       if (plant.type) {
-				if (weather === "snowy") {
-          if (Math.random() > 0.5) {
-            newDead++;
-            return { ...plant, type: null, plowed: false, weeds: 0, health: 100, age: 0 };
-          }
-        }
         if (weather === "rainy") plant.water += 10;
         if (weather === "sunny") plant.water -= 10;
 					
-        if (plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0 || plant.age + 1 > plant.type.growTime) {
+        if ((weather === "snowy" &&  Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0 || plant.age + 2 > plant.type.growTime) {
           newDead++;
           return { ...plant, type: null, plowed: false, weeds: 0, health: 100, age: 0 };
         }
@@ -215,7 +209,7 @@ export default function Garden() {
         </div>
       </header>
       <div className="flex flex-row max-lg:flex-col max-lg:gap-3 justify-between items-center w-full px-4 text-center">
-        <div className="flex flex-col gap-2 border p-2 rounded-xl font-bold bg-background/90">
+        <div className="flex flex-col gap-2 border p-2 rounded-xl font-bold bg-background">
           <h1>INFO</h1>
           <div className="flex flex-col gap-4">
               <div className=" border-gray-800">
@@ -226,7 +220,7 @@ export default function Garden() {
               </div>
           </div>
         </div>
-        <div className="flex rounded-xl overflow-hidden h-fit bg-background/90">
+        <div className="flex rounded-xl overflow-hidden h-fit bg-background">
           <div className="grid grid-cols-7">
             {garden.plants.map((plant, i) => (
               <div onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
