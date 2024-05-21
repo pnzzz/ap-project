@@ -117,8 +117,8 @@ export default function Garden() {
       if (plant.type) {
         if (weather === "rainy") plant.water += 10;
         if (weather === "sunny") plant.water -= 10;
-
-        if ((weather === "snowy" && Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0 || plant.age + 2 == plant.type.growTime) {
+        //Snowy Weather or Water level under or at 10 or Water level over 90 or Weeds over 5 or Health under 0 or Plant is two days past fully grown it dies.
+        if ((weather === "snowy" && Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0) {
           newDead++;
           return { ...plant, type: null, plowed: false, weeds: 0, health: 100, age: 0 };
         }
@@ -145,7 +145,6 @@ export default function Garden() {
             plant.health -= 50;
             if (plant.health <= 0) {
               plant.type = null;
-              plant.plowed = false;
               plant.weeds = 0;
               plant.health = 100;
               plant.age = 0;
@@ -162,7 +161,6 @@ export default function Garden() {
           if (plant.type?.growTime === plant.age) {
 						if (plant.type.name === "carrot") {
 							setScore((score) => score + 1);
-							
 						}
 						if (plant.type.name === "corn") {
 							setScore((score) => score + 3);
@@ -172,12 +170,13 @@ export default function Garden() {
 						plant.weeds = 0;
 						plant.health = 100;
 						plant.age = 0;
-          } else toast.error("This plant isn't ready to be harvested yet!");
+          } else if (plant.type?.growTime !== undefined && plant.type?.growTime < plant.age) toast.error("This plant is past its prime and has wilted!");
+          else toast.error("This plant isn't ready to be harvested yet!");
           break;
         case "carrot":
           if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
-          else plant.type = { name: "carrot", growTime: 10, icon: "🥕" };
+          else plant.type = { name: "carrot", growTime: 2, icon: "🥕" };
           break;
 				case "corn":
 					if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
