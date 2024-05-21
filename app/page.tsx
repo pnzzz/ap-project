@@ -4,18 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { currentDay, currentPlayer, sIsTransitionVisible } from "@/store/atom";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
 	const setIsTransitionVisibl = useSetAtom(sIsTransitionVisible);
-	const setPlayerName = useSetAtom(currentPlayer);
-	const [name, setName] = useState<string>("");
+	const [playername, setPlayerName] = useAtom(currentPlayer);
   const day = useAtomValue(currentDay);
 	const startGame = () => {
 		// start game
-		setPlayerName(name)
 		setIsTransitionVisibl(true)
 	}
 	return (
@@ -32,7 +30,7 @@ export default function Home() {
 					<DialogContent className="w-full max-w-[800px] h-full max-h-[700px] overflow-scroll">
 						<DialogTitle>Enter Your Name</DialogTitle>
 						<div className="flex flex-col gap-2 w-full">
-							<Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" />
+							<Input value={playername} onChange={(e) => setPlayerName(e.target.value)} placeholder="Your Name" />
 							<Link href="/garden">
 								<Button className="w-full" onClick={startGame} size="lg">Play!</Button>
 							</Link>

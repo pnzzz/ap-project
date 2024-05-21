@@ -3,6 +3,8 @@ import { atom } from "jotai";
 
 export const showImagesAtom = atom<boolean>(false);
 
+export const scoreAtom = atom<number>(0);
+
 export const currentPlayer = atom<string>("Joshua");
 
 export const leaderboard = atom<object[]>([]);

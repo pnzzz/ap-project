@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { currentDay, currentPlayer, gardenAtom, sIsTransitionVisible, showImagesAtom, toolAtom, weatherAtom } from "@/store/atom";
+import { currentDay, currentPlayer, gardenAtom, sIsTransitionVisible, scoreAtom, showImagesAtom, toolAtom, weatherAtom } from "@/store/atom";
 import { useAtom, useAtomValue } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -76,7 +76,7 @@ export default function Garden() {
   // Hooks
 	const router = useRouter();
 	const showImages = useAtomValue(showImagesAtom);
-  const [score, setScore] = useState<number>(0);
+  const [score, setScore] = useAtom(scoreAtom);
   const player = useAtomValue(currentPlayer);
   const [day, setDay] = useAtom(currentDay);
   const [tool, setTool] = useAtom(toolAtom);
@@ -88,7 +88,7 @@ export default function Garden() {
   // Intro Transition
   useEffect(() => {
     if (day === 0) {
-      setTimeout(dayChange, 2000);
+      setTimeout(dayChange, 1000);
 			console.log('day changed');
       setTimeout(() => setIsTransitionVisible(false), 4000);
     }
@@ -98,14 +98,13 @@ export default function Garden() {
   const handleNextDay = () => {
     setIsTransitionVisible(true);
     setDead(0);
-    setTimeout(dayChange, 2000);
+    setTimeout(dayChange, 1000);
     setTimeout(() => setIsTransitionVisible(false), 4000);
   };
 
   // Day Change Function
   const dayChange = () => {
-		if (day === 0) setDay(1);
-		else if (day === 100) router.push("/end")
+		if (day === 100) router.push("/end")
 		else setDay((prevDay) => prevDay + 1);
     setWeather(getRandomWeather());
     setGarden((prevGarden) => processGarden(prevGarden));
@@ -118,12 +117,12 @@ export default function Garden() {
       if (plant.type) {
         if (weather === "rainy") plant.water += 10;
         if (weather === "sunny") plant.water -= 10;
-					
-        if ((weather === "snowy" &&  Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0 || plant.age + 2 > plant.type.growTime) {
+
+        if ((weather === "snowy" && Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0 || plant.age + 2 == plant.type.growTime) {
           newDead++;
           return { ...plant, type: null, plowed: false, weeds: 0, health: 100, age: 0 };
         }
-        return { ...plant, age: plant.age + 1, weeds: plant.weeds + 1 };
+        return { ...plant, age: plant.age + 1, weeds: plant.weeds + Math.floor(Math.random() * 2) };
       }
       return plant;
     });
@@ -178,12 +177,12 @@ export default function Garden() {
         case "carrot":
           if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
-          else plant.type = { name: "carrot", growTime: 1, icon: "🥕" };
+          else plant.type = { name: "carrot", growTime: 10, icon: "🥕" };
           break;
 				case "corn":
 					if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
-					else plant.type = { name: "corn", growTime: 1, icon: "🌽" };
+					else plant.type = { name: "corn", growTime: 20, icon: "🌽" };
 					break;
       }
 
@@ -257,13 +256,32 @@ export default function Garden() {
 }
 
 const TransitionScreen = ({ day, isVisible, dead, weather }: { day: number, isVisible: boolean, dead: number, weather: string }) => {
+  const [showText, setShowText] = useState(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      const timeout1 = setTimeout(() => setShowText(true), 2000);
+      return () => clearTimeout(timeout1);
+    } else {
+      setTimeout(() => setShowText(false), 1000)
+    }
+  }, [isVisible]);
+
   return (
-    <div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center bg-background transition-opacity z-50 duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-			<div className="flex flex flex-col items-center justify-center gap-4">
-      	<h1 className="text-4xl font-bold">Day {day}</h1>
-				<h2 className="transition-all">Plants Died: {dead}</h2>
-				<h2 className="transition-all">Weather: {weather}</h2>
-			</div>
+    <div
+      className={`fixed top-0 left-0 w-full h-full flex items-center justify-center bg-background transition-opacity z-50 duration-1000 ${
+        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+    >
+      <div className="flex flex flex-col items-center justify-center gap-4">
+        <h1 className="text-4xl font-bold">Day {day}</h1>
+        <h2 className={`opacity-0 ${showText ? 'animate-fade-in' : 'animate-fade-out'}`}>
+          Plants Died: {dead}
+        </h2>
+        <h2 className={`opacity-0 delay-1000 ${showText ? 'animate-fade-in' : 'animate-fade-out'}`}>
+          Weather: {weathers.find(w => w.name === weather)?.icon} {weather}
+        </h2>
+      </div>
     </div>
   );
 };
