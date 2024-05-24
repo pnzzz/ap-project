@@ -1,7 +1,9 @@
 import { GardenProps, Tools, Weather } from "@/app/garden/page";
 import { atom } from "jotai";
 
-export const showImagesAtom = atom<boolean>(false);
+export const music = atom<boolean>(true);
+
+export const showImagesAtom = atom<boolean>(true);
 
 export const scoreAtom = atom<number>(0);
 

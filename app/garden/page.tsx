@@ -1,4 +1,5 @@
 "use client";
+import BackgroundMusic from "@/components/music";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { currentDay, currentPlayer, gardenAtom, sIsTransitionVisible, scoreAtom, showImagesAtom, toolAtom, weatherAtom } from "@/store/atom";
@@ -40,14 +41,12 @@ export type Weather = "sunny" | "rainy" | "cloudy" | "snowy";
 
 // Constants
 const initialWeather: Weather = "sunny";
-const plantTypes: PlantType[] = [
-  { name: "Carrot", growTime: 10, icon: "🥕" },
-	{ name: "Corn", growTime: 15, icon: "🌽" },
+const plantTypes = [
+  { name: "carrot", growTime: 10, icon: "🥕" },
+	{ name: "corn", growTime: 15, icon: "🌽" },
 ];
 const tools = [
   { name: "plow", icon: "⛏️" },
-  { name: "carrot", icon: "🥕" },
-	{ name: "corn", icon: "🌽" },
   { name: "water", icon: "💧" },
   { name: "weed", icon: "🌿" },
   { name: "harvest", icon: "🌾" },
@@ -115,8 +114,8 @@ export default function Garden() {
     let newDead = 0;
     const newPlants = garden.plants.map((plant) => {
       if (plant.type) {
-        if (weather === "rainy") plant.water += 10;
-        if (weather === "sunny") plant.water -= 10;
+        if (weather === "rainy") plant.water += 20;
+        if (weather === "sunny") plant.water -= 20;
         //Snowy Weather or Water level under or at 10 or Water level over 90 or Weeds over 5 or Health under 0 or Plant is two days past fully grown it dies.
         if ((weather === "snowy" && Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0) {
           newDead++;
@@ -130,7 +129,7 @@ export default function Garden() {
     return { ...garden, plants: newPlants };
   };
 
-  // Handle Tool
+  // Handles action on plant based on tool
   const handleTool = (tool: Tools, index: number) => {
     setGarden((prevGarden) => {
       const newGarden = { ...prevGarden, plants: [...prevGarden.plants] };
@@ -195,11 +194,11 @@ export default function Garden() {
 			<TransitionScreen day={day} isVisible={isTransitionVisible} dead={dead} weather={weather} />
 			{showImages && <Sunny weather={weather} />}
 			{weather === "snowy" && <Snowfall />}
-      <header className="grid grid-cols-3 w-full items-center bg-background/90 p-2 rounded-xl max-sm:mb-2">
+      <header className="grid grid-cols-3 max-md:grid-cols-2 w-full items-center bg-background/90 p-2 rounded-xl max-sm:mb-2">
         <div className="text-start">
 					<h1 className="text-3xl font-bold max-md:text-lg">Score: {score}</h1>
 				</div>
-        <div className="w-full">
+        <div className="w-full max-md:hidden">
           <h1 className="text-3xl font-bold text-center max-md:hidden">{player}&apos;s Garden</h1>
         </div>
         <div className="flex justify-end">
@@ -224,7 +223,7 @@ export default function Garden() {
               <div onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
                 {plant.type ? 
 								<div className="flex flex-col gap-2 max-md:gap-0 text-center justify-center select-none">
-								{plant.age >= plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
+								{plant.age === plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : plant.age > plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">🥀</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
 									<p className="max-sm:hidden">{plant.type.name}</p>
 									{plant.weeds > 0 ? <p className="text-red-500 max-sm:text-[8px]">🌿 {plant.weeds}</p> : <p className="max-sm:text-[8px]">🌿 0</p>}
 								</div>
@@ -238,11 +237,20 @@ export default function Garden() {
           <div className="flex flex-col gap-2">
             <ToggleGroup type="single" className="flex flex-col max-lg:flex-row overflow-scroll" value={tool} onValueChange={(value: Tools) => setTool(value)}>
               {tools.map((tool, i) => (
-                <ToggleGroupItem key={i} value={tool.name} title={tool.name} className="max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 border">
+                <ToggleGroupItem key={i} value={tool.name} title={tool.name} className="max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 border flex flex-col">
                   <div className="text-2xl">
                     {tool.icon}
                   </div>
+                  <p className="text-[12px] max-md:text-[8px] max-sm:text-[6px]">{tool.name}</p>
                 </ToggleGroupItem>
+              ))}
+              {plantTypes.map((plant, i) => (
+                <ToggleGroupItem key={i} value={plant.name} title={plant.name} className="overflow-hidden max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 border flex flex-col">
+                <div className="text-2xl">
+                  {plant.icon}
+                </div>
+                <p className="text-[12px] max-md:text-[8px] max-sm:text-[6px]">{plant.name}</p>
+              </ToggleGroupItem>
               ))}
             </ToggleGroup>
           </div>

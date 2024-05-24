@@ -5,11 +5,12 @@ import { Providers } from "@/lib/providers";
 import { Toaster } from "sonner";
 import Footer from "@/components/footer";
 
+
 const inter = Press_Start_2P({ subsets: ["latin"], weight: "400" });
 const norm = Inter({ subsets: ["latin"], weight: "400" })
 
 export const metadata: Metadata = {
-  title: "Game",
+  title: "The Garden Game",
   description: "AP Comp Sci Project",
 };
 
