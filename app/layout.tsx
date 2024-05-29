@@ -10,8 +10,8 @@ const inter = Press_Start_2P({ subsets: ["latin"], weight: "400" });
 const norm = Inter({ subsets: ["latin"], weight: "400" })
 
 export const metadata: Metadata = {
-  title: "The Garden Game",
-  description: "AP Comp Sci Project",
+  title: "Gardane",
+  description: "A Mundane Garden Game",
 };
 
 export default function RootLayout({
