@@ -15,7 +15,7 @@ const BackgroundMusic = () => {
   return (
     <>
       <audio src={'/music.mp3'} autoPlay loop muted={playing} />
-      <button onClick={togglePlay}>
+      <button title="Kakariko Village - The Legend of Zelda: A Link Between Worlds (Extended Music)" onClick={togglePlay}>
         {playing ? '🔇' : '🔊'}
       </button>
     </>
