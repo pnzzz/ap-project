@@ -5,8 +5,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { currentDay, currentPlayer, gardenAtom, sIsTransitionVisible, scoreAtom, showImagesAtom, toolAtom, weatherAtom } from "@/store/atom";
 import { useAtom, useAtomValue } from "jotai";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Snowfall } from "react-snowfall";
 import { toast } from "sonner";
 
@@ -43,7 +44,7 @@ export type Weather = "sunny" | "rainy" | "cloudy" | "snowy";
 const initialWeather: Weather = "sunny";
 const plantTypes = [
   { name: "carrot", growTime: 10, icon: "🥕" },
-	{ name: "corn", growTime: 15, icon: "🌽" },
+	{ name: "corn", growTime: 20, icon: "🌽" },
 ];
 const tools = [
   { name: "plow", icon: "⛏️" },
@@ -113,9 +114,11 @@ export default function Garden() {
   const processGarden = (garden: GardenProps) => {
     let newDead = 0;
     const newPlants = garden.plants.map((plant) => {
+      if (weather === "rainy" && plant.water < 80)
+          plant.water += 20;
+      if (weather === "sunny" && plant.water > 20)
+        plant.water -= 20;
       if (plant.type) {
-        if (weather === "rainy") plant.water += 20;
-        if (weather === "sunny") plant.water -= 20;
         //Snowy Weather or Water level under or at 10 or Water level over 90 or Weeds over 5 or Health under 0 or Plant is two days past fully grown it dies.
         if ((weather === "snowy" && Math.random() > 0.5) || plant.water <= 10 || plant.water > 90 || plant.weeds > 5 || plant.health <= 0) {
           newDead++;
@@ -153,16 +156,16 @@ export default function Garden() {
           }
           break;
         case "weed":
+          if (!plant.plowed) toast.error("You can't weed a plant that doesn't exist!");
           if (plant.type && plant.weeds > 0) plant.weeds -= 1;
-          else toast.error("You can't weed a plant that doesn't exist!");
           break;
         case "harvest":
           if (plant.type?.growTime === plant.age) {
 						if (plant.type.name === "carrot") {
-							setScore((score) => score + 1);
+							setScore((score) => score + 100);
 						}
 						if (plant.type.name === "corn") {
-							setScore((score) => score + 3);
+							setScore((score) => score + 300);
 						}
 						plant.type = null;
 						plant.plowed = false;
@@ -175,7 +178,7 @@ export default function Garden() {
         case "carrot":
           if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
-          else plant.type = { name: "carrot", growTime: 2, icon: "🥕" };
+          else plant.type = { name: "carrot", growTime: 10, icon: "🥕" };
           break;
 				case "corn":
 					if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
@@ -195,8 +198,10 @@ export default function Garden() {
 			{showImages && <Sunny weather={weather} />}
 			{weather === "snowy" && <Snowfall />}
       <header className="grid grid-cols-3 max-md:grid-cols-2 w-full items-center bg-background/90 p-2 rounded-xl max-sm:mb-2">
-        <div className="text-start">
-					<h1 className="text-3xl font-bold max-md:text-lg">Score: {score}</h1>
+        <div className="justify-start">
+          <Link href="/">
+            <Button>Home</Button>
+          </Link>
 				</div>
         <div className="w-full max-md:hidden">
           <h1 className="text-3xl font-bold text-center max-md:hidden">{player}&apos;s Garden</h1>
@@ -205,31 +210,39 @@ export default function Garden() {
           <Button onClick={handleNextDay}>Next Day</Button>
         </div>
       </header>
-      <div className="flex flex-row max-lg:flex-col max-lg:gap-3 justify-between items-center w-full px-4 text-center">
+      <div className="max-lg:mt-2 max-md:mt-0 flex flex-row max-lg:flex-col max-lg:gap-3 justify-between items-center w-full px-4 text-center">
         <div className="flex flex-col gap-2 border p-2 rounded-xl font-bold bg-background">
           <h1>INFO</h1>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col max-lg:flex-row max-sm:flex-col gap-4">
               <div className=" border-gray-800">
                 Day: {day}
               </div>
               <div className=" border-gray-800">
                 {weathers.find(w => w.name === weather)?.icon} {weather}
               </div>
+              <div className=" border-gray-800">
+                Score: {score}
+              </div>
           </div>
         </div>
-        <div className="flex rounded-xl overflow-hidden h-fit bg-background">
-          <div className="grid grid-cols-7">
-            {garden.plants.map((plant, i) => (
-              <div onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
-                {plant.type ? 
-								<div className="flex flex-col gap-2 max-md:gap-0 text-center justify-center select-none">
-								{plant.age === plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : plant.age > plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">🥀</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
-									<p className="max-sm:hidden">{plant.type.name}</p>
-									{plant.weeds > 0 ? <p className="text-red-500 max-sm:text-[8px]">🌿 {plant.weeds}</p> : <p className="max-sm:text-[8px]">🌿 0</p>}
-								</div>
-								: <div/>}
-              </div>
-            ))}
+        <div className="relative mt-2">
+          <div className="absolute -top-3 right-1/2 translate-x-1/2 border rounded-sm bg-background">
+            <p className="text-xs">Garden Plot</p>
+          </div>
+          <div className="flex rounded-xl overflow-hidden h-fit bg-background">
+            <div className="grid grid-cols-7">
+              {garden.plants.map((plant, i) => (
+                <div onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
+                  {plant.type ? 
+                  <div className="flex flex-col gap-2 max-md:gap-0 text-center justify-center select-none">
+                  {plant.age === plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : plant.age > plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">🥀</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
+                    <p className="max-sm:hidden">{plant.type.name}</p>
+                    {plant.weeds > 0 ? <p className="text-red-500 max-sm:text-[8px]">🌿 {plant.weeds}</p> : <p className="max-sm:text-[8px]">🌿 0</p>}
+                  </div>
+                  : <div/>}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-2 border p-2 rounded-xl text-center bg-background/90">
@@ -283,10 +296,10 @@ const TransitionScreen = ({ day, isVisible, dead, weather }: { day: number, isVi
       <div className="flex flex flex-col items-center justify-center gap-4">
         <h1 className="text-4xl font-bold">Day {day}</h1>
         <h2 className={`opacity-0 ${showText ? 'animate-fade-in' : 'animate-fade-out'}`}>
-          Plants Died: {dead}
+          Weather: {weathers.find(w => w.name === weather)?.icon} {weather}
         </h2>
         <h2 className={`opacity-0 delay-1000 ${showText ? 'animate-fade-in' : 'animate-fade-out'}`}>
-          Weather: {weathers.find(w => w.name === weather)?.icon} {weather}
+          Plants Died: {dead}
         </h2>
       </div>
     </div>

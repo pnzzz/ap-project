@@ -1,6 +1,5 @@
 'use client'
 
-import BackgroundMusic from "@/components/music";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -26,7 +25,10 @@ export default function Home() {
 			<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-background -z-10 opacity-75">
 				<Image alt="bg" src="/sunny.webp" layout="fill" objectFit="cover" />
 			</div>
-      <h1 className="text-4xl font-bold p-2 rounded-xl bg-background/50">Welcome to The Garden Game</h1>
+			<div className="px-5 py-3 rounded-xl bg-background/50 flex flex-col justify-center text-center gap-2">
+				<h1 className="text-4xl font-bold ">Gardane</h1>
+				<p>The Mundane Garden Game</p>
+			</div>
       <div className="flex flex-col gap-4 justify-center items-center">
 					{day > 0 ? <Link href="/garden"><Button size="lg">Continue Game</Button></Link> :
           <Dialog>
@@ -54,7 +56,7 @@ export default function Home() {
 					</DialogTrigger>
 					<DialogContent className="w-full max-w-[800px] h-full max-h-[700px] overflow-scroll">
 						<DialogTitle>How To Play</DialogTitle>
-						<DialogDescription>You are a Farmer. Plant and Harvest Crops to Earn Points.</DialogDescription>
+						<DialogDescription>Welcome to Gardane! You are a Farmer. Plant and Harvest Crops to Earn Points.</DialogDescription>
 						<h1 className="text-lg font-semibold mt-4">Starting Off</h1>
 							<div className="flex flex-col gap-4 text-xs rounded-xl p-2 border">
 								<div className="flex flex-row justify-between items-center">
