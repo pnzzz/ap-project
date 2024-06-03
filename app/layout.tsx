@@ -10,7 +10,7 @@ const inter = Press_Start_2P({ subsets: ["latin"], weight: "400" });
 const norm = Inter({ subsets: ["latin"], weight: "400" })
 
 export const metadata: Metadata = {
-  title: "Gardane",
+  title: "A Mundane Garden Game - Gardane.net",
   description: "A Mundane Garden Game",
 };
 

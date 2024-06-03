@@ -188,6 +188,9 @@ export default function Garden() {
 						if (plant.type.name === "corn") {
 							setScore((score: number) => score + 300);
 						}
+						if (plant.type.name === "pepper") {
+							setScore((score: number) => score + 500);
+						}
 						plant.type = null;
 						plant.plowed = false;
 						plant.weeds = 0;
