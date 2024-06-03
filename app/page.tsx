@@ -30,26 +30,28 @@ export default function Home() {
 				<p>The Mundane Garden Game</p>
 			</div>
       <div className="flex flex-col gap-4 justify-center items-center">
-					{day > 0 ? <Link href="/garden"><Button size="lg">Continue Game</Button></Link> :
+					{day > 0 ? <Button asChild size="lg"><Link href="/garden">Continue Game</Link></Button> :
           <Dialog>
-					<DialogTrigger>
+					<DialogTrigger asChild>
 						<Button size="lg">
 							New Game
 						</Button>
 					</DialogTrigger>
-					<DialogContent className="">
+					<DialogContent>
 						<DialogTitle>Enter Your Name</DialogTitle>
 						<div className="flex flex-col gap-2 w-full">
 							<Input value={playername} onChange={(e) => setPlayerName(e.target.value)} placeholder="Your Name" />
-							<Link href="/garden">
-								<Button className="w-full" onClick={startGame} size="lg">Play!</Button>
-							</Link>
+								<Button asChild className="w-full" onClick={startGame} size="lg">
+									<Link href="/garden">
+										Play!
+									</Link>
+								</Button>
 						</div>
 					</DialogContent>
 				</Dialog>
 					}
 				<Dialog>
-					<DialogTrigger>
+					<DialogTrigger asChild>
 						<Button size="lg">
 							How To Play
 						</Button>
@@ -57,6 +59,12 @@ export default function Home() {
 					<DialogContent className="w-full max-w-[800px] h-full max-h-[700px] overflow-scroll">
 						<DialogTitle>How To Play</DialogTitle>
 						<DialogDescription>Welcome to Gardane! You are a Farmer. Plant and Harvest Crops to Earn Points.</DialogDescription>
+						<h1 className="text-lg font-semibold mt-4">Updates!</h1>
+							<div className="flex flex-col gap-4 text-xs rounded-xl p-2 border">
+								<div className="flex flex-row justify-between items-center">
+									<div>You can now drag across the plot! (A bit buggy, be careful.)</div>
+								</div>
+							</div>
 						<h1 className="text-lg font-semibold mt-4">Starting Off</h1>
 							<div className="flex flex-col gap-4 text-xs rounded-xl p-2 border">
 								<div className="flex flex-row justify-between items-center">
@@ -128,11 +136,15 @@ export default function Home() {
 							<div className="flex flex-col gap-4 text-xs rounded-xl p-2 border">
 								<div className="flex flex-row justify-between items-center">
 									<div className="text-2xl">🥕</div>
-									<div>Time to Grow - 10 Days | 1 Point</div>
+									<div>Time to Grow - 10 Days | 100 Points</div>
 								</div>
 								<div className="flex flex-row justify-between items-center">
 									<div className="text-2xl">🌽</div>
-									<div>Time to Grow - 20 Days | 3 Points</div>
+									<div>Time to Grow - 20 Days | 300 Points</div>
+								</div>
+								<div className="flex flex-row justify-between items-center">
+									<div className="text-2xl">🌶️</div>
+									<div>Time to Grow - 30 Days | 500 Points</div>
 								</div>
 							</div>
 							<h1 className="text-lg font-semibold mt-4">End Game</h1>

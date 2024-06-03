@@ -1,5 +1,5 @@
 "use client";
-import BackgroundMusic from "@/components/music";
+
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { currentDay, currentPlayer, gardenAtom, sIsTransitionVisible, scoreAtom, showImagesAtom, toolAtom, weatherAtom } from "@/store/atom";
@@ -7,7 +7,7 @@ import { useAtom, useAtomValue } from "jotai";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Snowfall } from "react-snowfall";
 import { toast } from "sonner";
 
@@ -37,7 +37,7 @@ interface PlantType {
 }
 
 // Types
-export type Tools = "water" | "plow" | "harvest" | "carrot" | "corn" | "weed";
+export type Tools = "water" | "plow" | "harvest" | "carrot" | "corn" | "pepper" | "weed";
 export type Weather = "sunny" | "rainy" | "cloudy" | "snowy";
 
 // Constants
@@ -45,6 +45,7 @@ const initialWeather: Weather = "sunny";
 const plantTypes = [
   { name: "carrot", growTime: 10, icon: "🥕" },
 	{ name: "corn", growTime: 20, icon: "🌽" },
+	{ name: "pepper", growTime: 30, icon: "🌶️" },
 ];
 const tools = [
   { name: "plow", icon: "⛏️" },
@@ -84,6 +85,26 @@ export default function Garden() {
   const [weather, setWeather] = useAtom(weatherAtom);
   const [garden, setGarden] = useAtom(gardenAtom);
   const [isTransitionVisible, setIsTransitionVisible] = useAtom(sIsTransitionVisible);
+
+	//Dragging
+	const [isDragging, setIsDragging] = useState(false);
+	const lastPlotIndexRef = useRef<number | null>(null);
+
+	const handleMouseDown = () => {
+    setIsDragging(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    lastPlotIndexRef.current = null;
+  };
+
+  const handleMouseOver = (index: number) => {
+    if (isDragging && lastPlotIndexRef.current !== index) {
+      lastPlotIndexRef.current = index;
+      handleTool(tool, index);
+    }
+  };
 
   // Intro Transition
   useEffect(() => {
@@ -162,10 +183,10 @@ export default function Garden() {
         case "harvest":
           if (plant.type?.growTime === plant.age) {
 						if (plant.type.name === "carrot") {
-							setScore((score) => score + 100);
+							setScore((score: number) => score + 100);
 						}
 						if (plant.type.name === "corn") {
-							setScore((score) => score + 300);
+							setScore((score: number) => score + 300);
 						}
 						plant.type = null;
 						plant.plowed = false;
@@ -185,6 +206,11 @@ export default function Garden() {
 					else if (plant.type) toast.error("You can't plant on soil that's already planted!");
 					else plant.type = { name: "corn", growTime: 20, icon: "🌽" };
 					break;
+					case "pepper":
+						if (!plant.plowed) toast.error("You can't plant on unplowed soil!");
+						else if (plant.type) toast.error("You can't plant on soil that's already planted!");
+						else plant.type = { name: "pepper", growTime: 30, icon: "🌶️" };
+						break;
       }
 
       newGarden.plants[index] = plant;
@@ -193,15 +219,13 @@ export default function Garden() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-4" >
+    <main className="flex min-h-screen flex-col items-center justify-between p-4" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
 			<TransitionScreen day={day} isVisible={isTransitionVisible} dead={dead} weather={weather} />
 			{showImages && <Sunny weather={weather} />}
 			{weather === "snowy" && <Snowfall />}
       <header className="grid grid-cols-3 max-md:grid-cols-2 w-full items-center bg-background/90 p-2 rounded-xl max-sm:mb-2">
         <div className="justify-start">
-          <Link href="/">
-            <Button>Home</Button>
-          </Link>
+            <Button asChild><Link href="/">Home</Link></Button>
 				</div>
         <div className="w-full max-md:hidden">
           <h1 className="text-3xl font-bold text-center max-md:hidden">{player}&apos;s Garden</h1>
@@ -227,12 +251,12 @@ export default function Garden() {
         </div>
         <div className="relative mt-2">
           <div className="absolute -top-3 right-1/2 translate-x-1/2 border rounded-sm bg-background">
-            <p className="text-xs">Garden Plot</p>
+            {isDragging && lastPlotIndexRef.current ? <p className="text-xs text-red-500">*You Are Dragging*</p> : null}
           </div>
           <div className="flex rounded-xl overflow-hidden h-fit bg-background">
             <div className="grid grid-cols-7">
               {garden.plants.map((plant, i) => (
-                <div onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
+                <div onMouseOver={() => handleMouseOver(i)} onClick={() => handleTool(tool, i)} key={i} className={`${(plant.water > 90) ? "bg-blue-900/15" : (plant.water >= 60) ? "bg-orange-700/30" : (plant.water >= 30) ? "bg-orange-700/40" : plant.plowed ? "bg-orange-900/80" : "bg-orange-800"} ${plant.plowed ? "opacity-75" : "opacity-100"} max-sm:w-12 max-sm:h-12 max-md:w-16 max-md:h-16 w-24 h-24 cursor-pointer border border-black items-center justify-center flex text-xs text-center`}>
                   {plant.type ? 
                   <div className="flex flex-col gap-2 max-md:gap-0 text-center justify-center select-none">
                   {plant.age === plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">{plant.type.icon}</p> : plant.age > plant.type.growTime ? <p className="text-3xl max-sm:text-[11px]">🥀</p> : <p className="text-3xl max-sm:text-[11px]">🌱</p>}
