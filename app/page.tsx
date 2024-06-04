@@ -150,11 +150,15 @@ export default function Home() {
 							<h1 className="text-lg font-semibold mt-4">End Game</h1>
 							<div className="flex flex-col gap-4 text-xs rounded-xl p-2 border">
 								<div className="flex flex-row justify-between items-center">
+									<div>The Game Will End at 100 Days.</div>
+								</div>
+								<div className="flex flex-row justify-between items-center">
 									<div>Refresh to End Game - You can skip between pages, just not refresh.</div>
 								</div>
 							</div>
 					</DialogContent>
 				</Dialog>
+				{day !== 0 ? <Button onClick={() => window.location.reload()}>End Game</Button> : null}
       </div>
     </main>
   );
